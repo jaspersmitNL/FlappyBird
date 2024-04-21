@@ -17,8 +17,11 @@ public class MathUtil {
         return new Matrix4f().ortho2D(left, right, bottom, top);
     }
 
-    public static Matrix4f getTransformationMatrix(Vector3f position, Vector3f rotation, Vector3f scale) {
-        return new Matrix4f().translate(position).rotateX((float) Math.toRadians(rotation.x)).rotateY((float) Math.toRadians(rotation.y)).rotateZ((float) Math.toRadians(rotation.z)).scale(scale);
+    public static Matrix4f getTransformationMatrix(Vector3f position, float rotation, Vector3f scale) {
+        return new Matrix4f()
+                .translate(position)
+                .rotateZ((float) Math.toRadians(rotation))
+                .scale(scale);
     }
 
 }

@@ -3,7 +3,6 @@ package nl.jasper.flappy;
 import nl.jasper.flappy.render.Mesh;
 import nl.jasper.flappy.render.Shader;
 import nl.jasper.flappy.render.Texture;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public abstract class GameObject {
@@ -12,7 +11,7 @@ public abstract class GameObject {
     private Texture texture;
 
     public Vector3f position = new Vector3f();
-    public Vector3f rotation = new Vector3f(0);
+    public float rotation = 0;
     public Vector3f scale = new Vector3f(1);
 
 
@@ -26,7 +25,7 @@ public abstract class GameObject {
         shader.setUniform("transformation", MathUtil.getTransformationMatrix(position, rotation, scale));
         texture.bind();
         mesh.bind();
-        mesh.draw();
+        mesh.render();
 
     }
 

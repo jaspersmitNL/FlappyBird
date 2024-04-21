@@ -48,7 +48,7 @@ dependencies {
 
 tasks.withType<Jar> {
     manifest {
-        attributes["Main-Class"] = "nl.jasper.flappy.Main"
+        attributes["Main-Class"] = "nl.jasper.flappy.FlappyBird"
     }
 }
 

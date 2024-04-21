@@ -2,9 +2,11 @@ package nl.jasper.flappy;
 
 import nl.jasper.flappy.objects.Background;
 import nl.jasper.flappy.objects.Bird;
+import nl.jasper.flappy.objects.Pipe;
 import nl.jasper.flappy.render.Mesh;
 import nl.jasper.flappy.render.Shader;
 import nl.jasper.flappy.render.Texture;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -14,11 +16,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33.*;
 
-public class Main {
+public class FlappyBird {
 
     public static int WIDTH = 1080;
     public static int HEIGHT = 720;
@@ -27,25 +30,38 @@ public class Main {
 
 
     private long window;
-    private Shader basicShader;
+    private Shader basicShader, backgroundShader;
+
+
+
+
+    private Texture birdTexture;
+    private Texture backgroundTexture;
+    private Texture pipeTexture;
+
+    private Mesh birdMesh;
+    private Mesh backgroundMesh;
+    private Mesh pipeMesh;
+
+
     private Bird bird;
 
-    private List<GameObject> gameObjects = new ArrayList<>();
-
-
-    private Mesh backgroundMesh;
-    private Texture backgroundTexture;
-
     private List<Background> backgrounds = new ArrayList<>();
+    private List<Pipe> pipes = new ArrayList<>();
 
 
     private void setup() {
 
 
         this.basicShader = new Shader(readFile("assets/shaders/basic.vert.glsl"), readFile("assets/shaders/basic.frag.glsl"));
+        this.backgroundShader = new Shader(readFile("assets/shaders/bg.vert.glsl"), readFile("assets/shaders/bg.frag.glsl"));
+
+        this.birdTexture = new Texture("assets/bird.png");
+        this.backgroundTexture = new Texture("assets/bg.png");
+        this.pipeTexture = new Texture("assets/pipe.png");
 
 
-        this.bird = new Bird(new Mesh(new float[]{
+        this.birdMesh = new Mesh(new float[]{
                 -0.5f, 0.5f, 0.0f,
                 -0.5f, -0.5f, 0.0f,
                 0.5f, -0.5f, 0.0f,
@@ -58,11 +74,7 @@ public class Main {
                 0, 0,
                 1, 0,
                 1, 1
-        }), new Texture("assets/bird.png"));
-
-        bird.position.set(0, 0, 1);
-
-        this.gameObjects.add(bird);
+        });
 
         this.backgroundMesh = new Mesh(new float[]{
                 -0.5f, 1, 0,
@@ -78,16 +90,46 @@ public class Main {
                 1, 0,
                 1, 1
         });
-        this.backgroundTexture = new Texture("assets/bg.png");
+
+        float pipeWidth = 0.1f;
+        this.pipeMesh = new Mesh(new float[]{
+                -pipeWidth, 1, 0,
+                -pipeWidth, -1, 0,
+                pipeWidth, -1, 0,
+                pipeWidth, 1, 0
+        }, new int[]{
+                0, 1, 3,
+                3, 1, 2
+        }, new float[]{
+                0, 1,
+                0, 0,
+                1, 0,
+                1, 1
+        });
 
 
-        float overlap = 0.05f;
-        for (int i = -1; i <= 2; i++) {
-            float positionX = i - overlap;
-            this.backgrounds.add(new Background(backgroundMesh, backgroundTexture).setPosition(new Vector3f(positionX, 0, 0)));
+        this.bird = new Bird(birdMesh, birdTexture);
+
+
+
+
+        for(float i = -1; i <= 2; i+= 1.000f) {
+            Background background = new Background(backgroundMesh, backgroundTexture).setPosition(new Vector3f(i, 0, 0));
+            this.backgrounds.add(background);
         }
 
 
+        this.addPipes();
+
+
+
+    }
+
+
+    private void addPipes() {
+
+        pipes.add(new Pipe(this,pipeMesh, pipeTexture).setPosition(new Vector3f(1.2f, -1.3f, 0.5f)));
+        pipes.add(new Pipe(this, pipeMesh, pipeTexture).setPosition(new Vector3f(1.2f, 1.3f, 0.5f)).setRotation(180));
 
     }
 
@@ -99,18 +141,24 @@ public class Main {
 
 
 
+        backgroundShader.bind();
+        backgroundShader.setUniform("projection", MathUtil.getProjectionMatrix(WIDTH, HEIGHT));
+        backgroundShader.setUniform("transformation", new Matrix4f());
+        for (Background background : backgrounds) {
+            background.render(backgroundShader);
+        }
 
         basicShader.bind();
         basicShader.setUniform("projection", MathUtil.getProjectionMatrix(WIDTH, HEIGHT));
 
-        for (Background background : backgrounds) {
-            background.render(basicShader);
+
+        for(Pipe pipe : pipes){
+            pipe.render(basicShader);
         }
 
 
-        for (GameObject object : gameObjects) {
-            object.render(basicShader);
-        }
+       bird.render(basicShader);
+
 
     }
 
@@ -120,11 +168,23 @@ public class Main {
         }
 
         if (playing) {
+            bird.update(deltaTime);
 
-            for (GameObject object : gameObjects) {
-                object.update(deltaTime);
+            for(int i =0; i < pipes.size(); i++) {
+                Pipe pipe = pipes.get(i);
+                pipe.update(deltaTime);
+
+                if(pipe.position.x < -1.2f){
+                    pipes.remove(pipe);
+                    System.out.println("Pipe removed");
+                }
+
             }
+
+
         }
+
+
     }
 
 
@@ -161,6 +221,7 @@ public class Main {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
             glViewport(0, 0, WIDTH, HEIGHT);
+            glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
 
 
             double currentTime = glfwGetTime();
@@ -189,6 +250,8 @@ public class Main {
             if (key == GLFW_KEY_SPACE && playing) {
                 bird.jump();
             }
+
+
         }
 
 
@@ -210,6 +273,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-        new Main().start();
+        new FlappyBird().start();
     }
 }

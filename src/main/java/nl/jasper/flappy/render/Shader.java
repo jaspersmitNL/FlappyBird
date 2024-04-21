@@ -24,8 +24,8 @@ public class Shader {
         glShaderSource(vertex, vertexSrc);
         glShaderSource(fragment, fragmentSrc);
 
-        compile(vertex);
-        compile(fragment);
+        compile(vertex, vertexSrc);
+        compile(fragment, fragmentSrc);
 
         glAttachShader(program, vertex);
         glAttachShader(program, fragment);
@@ -73,10 +73,11 @@ public class Shader {
         glUniformMatrix4fv(getUniform(name), false, value.get(new float[16]));
     }
 
-    private void compile(int shader) {
+    private void compile(int shader, String src) {
         glCompileShader(shader);
         if (glGetShaderi(shader, GL_COMPILE_STATUS) == GL_FALSE) {
             System.err.println("Failed to compile shader: " + glGetShaderInfoLog(shader));
+            System.err.println(src);
             System.exit(1);
         }
     }

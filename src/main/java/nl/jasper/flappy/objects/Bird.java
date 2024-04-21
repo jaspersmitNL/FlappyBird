@@ -13,6 +13,7 @@ public class Bird extends GameObject {
     public Bird(Mesh mesh, Texture texture) {
         super(mesh, texture);
         this.scale.set(0.25);
+        this.position.z = 1;
     }
 
 

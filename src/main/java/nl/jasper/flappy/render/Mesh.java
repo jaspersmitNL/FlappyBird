@@ -43,7 +43,7 @@ public class Mesh {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     }
 
-    public void draw() {
+    public void render() {
         glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
     }
 
