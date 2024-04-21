@@ -35,6 +35,7 @@ public class Shader {
         glDetachShader(program, vertex);
         glDetachShader(program, fragment);
 
+
     }
 
 

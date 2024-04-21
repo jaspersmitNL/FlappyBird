@@ -1,6 +1,7 @@
 package nl.jasper.flappy;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public class MathUtil {
@@ -17,11 +18,11 @@ public class MathUtil {
         return new Matrix4f().ortho2D(left, right, bottom, top);
     }
 
-    public static Matrix4f getTransformationMatrix(Vector3f position, float rotation, Vector3f scale) {
+    public static Matrix4f getTransformationMatrix(Vector3d position, float rotation, Vector3d scale) {
         return new Matrix4f()
-                .translate(position)
+                .translate((float) position.x, (float) position.y, (float) position.z)
                 .rotateZ((float) Math.toRadians(rotation))
-                .scale(scale);
+                .scale((float) scale.x, (float) scale.y, (float) scale.z);
     }
 
 }

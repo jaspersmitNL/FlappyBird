@@ -4,6 +4,7 @@ import nl.jasper.flappy.FlappyBird;
 import nl.jasper.flappy.GameObject;
 import nl.jasper.flappy.render.Mesh;
 import nl.jasper.flappy.render.Texture;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public class Pipe extends GameObject {
@@ -15,7 +16,7 @@ public class Pipe extends GameObject {
         this.flappyBird = flappyBird;
     }
 
-    public Pipe setPosition(Vector3f position) {
+    public Pipe setPosition(Vector3d position) {
         this.position = position;
         return this;
     }

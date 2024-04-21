@@ -7,6 +7,7 @@ import nl.jasper.flappy.render.Mesh;
 import nl.jasper.flappy.render.Shader;
 import nl.jasper.flappy.render.Texture;
 import org.joml.Matrix4f;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -76,11 +77,12 @@ public class FlappyBird {
                 1, 1
         });
 
+        float bgWidth = 0.5f;
         this.backgroundMesh = new Mesh(new float[]{
-                -0.5f, 1, 0,
-                -0.5f, -1, 0,
-                0.5f, -1, 0,
-                0.5f, 1, 0
+                -bgWidth, 1, 0,
+                -bgWidth, -1, 0,
+                bgWidth, -1, 0,
+                bgWidth, 1, 0
         }, new int[]{
                 0, 1, 3,
                 3, 1, 2
@@ -113,8 +115,8 @@ public class FlappyBird {
 
 
 
-        for(float i = -1; i <= 2; i+= 1.000f) {
-            Background background = new Background(backgroundMesh, backgroundTexture).setPosition(new Vector3f(i, 0, 0));
+        for(float i = -1; i <= 4; i+= 1.000f) {
+            Background background = new Background(backgroundMesh, backgroundTexture).setPosition(new Vector3d(i, 0, 0));
             this.backgrounds.add(background);
         }
 
@@ -128,8 +130,8 @@ public class FlappyBird {
 
     private void addPipes() {
 
-        pipes.add(new Pipe(this,pipeMesh, pipeTexture).setPosition(new Vector3f(1.2f, -1.3f, 0.5f)));
-        pipes.add(new Pipe(this, pipeMesh, pipeTexture).setPosition(new Vector3f(1.2f, 1.3f, 0.5f)).setRotation(180));
+        pipes.add(new Pipe(this,pipeMesh, pipeTexture).setPosition(new Vector3d(1.2f, -1.3f, 0.5f)));
+        pipes.add(new Pipe(this, pipeMesh, pipeTexture).setPosition(new Vector3d(1.2f, 1.3f, 0.5f)).setRotation(180));
 
     }
 
@@ -144,12 +146,17 @@ public class FlappyBird {
         backgroundShader.bind();
         backgroundShader.setUniform("projection", MathUtil.getProjectionMatrix(WIDTH, HEIGHT));
         backgroundShader.setUniform("transformation", new Matrix4f());
+
+
         for (Background background : backgrounds) {
             background.render(backgroundShader);
         }
 
+
         basicShader.bind();
         basicShader.setUniform("projection", MathUtil.getProjectionMatrix(WIDTH, HEIGHT));
+
+
 
 
         for(Pipe pipe : pipes){
@@ -180,11 +187,7 @@ public class FlappyBird {
                 }
 
             }
-
-
         }
-
-
     }
 
 
